@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Deep Learning Model Trainer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script>
+        async function startTraining() {
+            const trainButton = document.getElementById('trainButton');
+            trainButton.disabled = true;
+            trainButton.innerText = 'Training...';
+
+            const response = await fetch('/train', { method: 'POST' });
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Training started. Please refresh the page after some time to see results.');
+            } else {
+                alert('Error: ' + data.status);
+            }
+
+            trainButton.disabled = false;
+            trainButton.innerText = 'Start Training';
+        }
+    </script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-3xl font-bold mb-4">Deep Learning Model Trainer</h1>
+
+        <section class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Dataset Preview</h2>
+            <div class="overflow-x-auto border rounded p-2 bg-gray-50">
+                {{ data_preview | safe }}
+            </div>
+        </section>
+
+        <section class="mb-6">
+            <button id="trainButton" onclick="startTraining()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                Start Training
+            </button>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-semibold mb-2">Training Status</h2>
+            {% if training_in_progress %}
+                <p class="text-yellow-600 font-semibold">Training is in progress...</p>
+            {% elif training_history %}
+                <div>
+                    <h3 class="font-semibold">Training Results:</h3>
+                    <ul class="list-disc list-inside">
+                        <li>Accuracy: {{ training_history['accuracy'][-1] }}</li>
+                        <li>Validation Accuracy: {{ training_history['val_accuracy'][-1] }}</li>
+                        <li>Loss: {{ training_history['loss'][-1] }}</li>
+                        <li>Validation Loss: {{ training_history['val_loss'][-1] }}</li>
+                    </ul>
+                </div>
+            {% else %}
+                <p>No training has been performed yet.</p>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>
