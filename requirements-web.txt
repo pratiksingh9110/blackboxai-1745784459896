@@ -1,0 +1,5 @@
+tensorflow
+sqlite3
+numpy
+pandas
+flask
